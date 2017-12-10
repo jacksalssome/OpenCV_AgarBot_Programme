@@ -41,8 +41,14 @@ def process_img(original_image):
     # Detect blobs.
     keypoints = detector.detect(processed_img)
 
-    win32api.SetCursorPos((int(keypoints[0].pt[0]),(int(keypoints[0].pt[1]))))
 
+    # Thanks to https://stackoverflow.com/users/5087436/alexander-reynolds
+    # Find nearest food.
+    pt = np.array([840, 525])
+    nearest_kp = min(keypoints, key=lambda kp: np.linalg.norm(kp.pt - pt))
+    nearest_kp.pt
+
+    win32api.SetCursorPos((int(nearest_kp.pt[0]),(int(nearest_kp.pt[1]))))
 
 
     # Draw detected blobs as red circles.
