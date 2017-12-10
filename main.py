@@ -3,7 +3,7 @@ from PIL import ImageGrab
 import numpy as np
 import time
 import win32api, win32con
-import pytesseract
+#import pytesseract
 from grabscreen import grab_screen
 
 #import screencapture
@@ -48,7 +48,7 @@ def process_img(original_image):
     nearest_kp = min(keypoints, key=lambda kp: np.linalg.norm(kp.pt - pt))
     nearest_kp.pt
 
-    win32api.SetCursorPos((int(nearest_kp.pt[0]),(int(nearest_kp.pt[1]))))
+    #win32api.SetCursorPos((int(nearest_kp.pt[0]), (int(nearest_kp.pt[1]))))
 
 
     # Draw detected blobs as red circles.
@@ -72,10 +72,11 @@ def click(x,y):
 
 #last_time = time.time()
 while(True):
-    screen = grab_screen(region=(0,0, 1680, 1050))
+    screen = grab_screen(region=(0, 0, 1680, 1050))
 
     new_screen = process_img(screen)
 
+    cv2.resize(new_screen, (100,50))
 
     #FPS
     #print('Current FPS: {}'.format((time.time() - last_time) * 1000)) #Broken
