@@ -7,7 +7,7 @@ This program uses OpenCV numpy, win32api, grabscreen from PIL/pillow. It is writ
 System requirments:
 - Fast processor
 - Internet
-- 1680 x 1050 screen. (You can edit screensizex and screensizey in main for your resulution)
+- 1680 x 1050 screen. (Testing branch has auto detection)
 - Windows 7 or better
 
 How to install/run:
