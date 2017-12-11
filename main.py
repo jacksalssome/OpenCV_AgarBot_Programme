@@ -2,14 +2,6 @@ import cv2
 import numpy as np
 import time
 import win32api, win32con
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-#import pytesseract
->>>>>>> bbb2c551a3ac85881c596c772d12a5e4e918ff78
-=======
-#import pytesseract
->>>>>>> bbb2c551a3ac85881c596c772d12a5e4e918ff78
 from grabscreen import grab_screen
 
 screen_sizex = 1650
@@ -73,27 +65,10 @@ def click(x,y):
 
 last_time = time.time()
 while(True):
-<<<<<<< HEAD
-<<<<<<< HEAD
     screen = grab_screen(region=(0,0, screen_sizex, screen_sizey))
 
     new_screen = process_img(screen)
 
-=======
-    screen = grab_screen(region=(0, 0, 1680, 1050))
-=======
-    screen = grab_screen(region=(0, 0, 1680, 1050))
-
-    new_screen = process_img(screen)
-
-    cv2.resize(new_screen, (100,50))
->>>>>>> bbb2c551a3ac85881c596c772d12a5e4e918ff78
-
-    new_screen = process_img(screen)
-
-    cv2.resize(new_screen, (100,50))
-
->>>>>>> bbb2c551a3ac85881c596c772d12a5e4e918ff78
     #FPS
     print('Frame Time: {}'.format((time.time() - last_time))) #Broken
     last_time = time.time()
