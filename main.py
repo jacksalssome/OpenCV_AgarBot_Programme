@@ -4,9 +4,9 @@ import time
 import win32api, win32con
 from grabscreen import grab_screen
 
-screen_sizex = 1650
-screen_sizey = 1080
-
+print("Welcome to The AgarBot Programme!")
+screen_sizex = int(input("Enter your horizontal screen resolution: "))
+screen_sizey = int(input("Enter your vertical screen resolution: "))
 
 #import screencapture
 def process_img(original_image):
@@ -17,9 +17,6 @@ def process_img(original_image):
 
     # Set up the SimpleBlobdetector with default parameters.
     params = cv2.SimpleBlobDetector_Params()
-    # Change thresholds
-    #params.minThreshold = 0;
-    #params.maxThreshold = 256;
     # Filter by Area.
     params.filterByArea = True
     params.minArea = 50
@@ -31,7 +28,7 @@ def process_img(original_image):
     params.minConvexity = 0.2
     # Filter by Inertia
     #params.filterByInertia = Truelinalg.norm
-    params.minInertiaRatio = 0.2
+    #params.minInertiaRatio = 0.2
 
     detector = cv2.SimpleBlobDetector_create(params)
     # Detect blobs.
@@ -43,7 +40,7 @@ def process_img(original_image):
     pt = np.array([(screen_sizex / 2), (screen_sizey / 2)])
     nearest_kp = min(keypoints, key=lambda kp: np.linalg.norm(kp.pt - pt))
 
-    #win32api.SetCursorPos((int(nearest_kp.pt[0]), (int(nearest_kp.pt[1]))))
+    win32api.SetCursorPos((int(nearest_kp.pt[0]), (int(nearest_kp.pt[1]))))
 
 
     # Draw detected blobs as red circles.
