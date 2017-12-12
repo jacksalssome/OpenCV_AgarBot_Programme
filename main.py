@@ -1,10 +1,12 @@
 import cv2
 import numpy as np
 import time
-import win32api, win32con
-from grabscreen import grab_screen
+import win32api, win32con, win32ui, win32gui
+#from grabscreen import grab_screen
+from ctypes import windll
+from PIL import Image
 
-skip_input = False
+skip_input = True
 doonce = 0
 
 print("Welcome to The AgarBot Programme!")
@@ -16,12 +18,13 @@ if skip_input == False:
 
     auto_screen_y_n = (input("Is your screen resulution: " + str(autoscreenx) + "x" + str(autoscreeny) + "? (y/n): "))
 
-    if auto_screen_y_n == "y" or "Y" or "YES" or "yes" or "Yes": #Classic VisualBasic
-        screen_sizex = autoscreenx
-        screen_sizey = autoscreeny
-    else:
+    if auto_screen_y_n == str("n"): #Classic VisualBasic
+        print("Wooo!")
         screen_sizex = int(input("Enter your horizontal screen resolution: "))
         screen_sizey = int(input("Enter your vertical screen resolution: "))
+    else:
+        screen_sizex = autoscreenx
+        screen_sizey = autoscreeny
 else:
     screen_sizex = 1680
     screen_sizey = 1050
@@ -52,11 +55,11 @@ def process_img(original_image):
 
     #win32api.SetCursorPos((int(nearest_kp.pt[0]), (int(nearest_kp.pt[1]))))
 
-    im2, contours, hierarchy = cv2.findContours(processed_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    #im2, contours, hierarchy = cv2.findContours(processed_img, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
     # Draw detected blobs as red circles.
     # cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS ensures the size of the circle corresponds to the size of blob
-    processed_img = cv2.drawContours(original_image, contours, -1, (0, 255, 0), 2)
+    #processed_img = cv2.drawContours(original_image, contours, -1, (0, 255, 0), 2)
     processed_img = cv2.drawKeypoints(original_image, keypoints, np.array([]), (255, 0, 0), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
     processed_img = cv2.circle(original_image, (int(nearest_kp.pt[0]), (int(nearest_kp.pt[1]))), 10, (0,0,255), -1)
     processed_img = cv2.circle(original_image, (int(screen_sizex / 2), int(screen_sizey / 2)), 10, (0, 255, 0), -1)
@@ -74,19 +77,49 @@ def click(x,y):
 
 last_time = time.time()
 while(True):
-    screen = grab_screen(region=(0,0, screen_sizex, screen_sizey))
+    #screen = grab_screen(region=(0,0, screen_sizex, screen_sizey))
 
-    new_screen = cv2.resize(process_img(screen), (int(screen_sizex / 1.1), int(screen_sizey / 1.1)))
+    hwnd = win32gui.FindWindow(None, 'Task Manager')
+
+    # Change the line below depending on whether you want the whole window
+    # or just the client area.
+    left, top, right, bot = win32gui.GetClientRect(hwnd)
+    width = right - left
+    height = bot - top
+
+    hwndDC = win32gui.GetWindowDC(hwnd)
+    mfcDC = win32ui.CreateDCFromHandle(hwndDC)
+    saveDC = mfcDC.CreateCompatibleDC()
+
+    saveBitMap = win32ui.CreateBitmap()
+    saveBitMap.CreateCompatibleBitmap(mfcDC, width, height)
+
+    saveDC.SelectObject(saveBitMap)
+    saveDC.BitBlt((0, 0), (width, height), mfcDC, (left, top), win32con.SRCCOPY)
+
+    bmpinfo = saveBitMap.GetInfo()
+    bmpstr = saveBitMap.GetBitmapBits(True)
+
+
+    screen = Image.frombuffer('RGB', (bmpinfo['bmWidth'], bmpinfo['bmHeight']), bmpstr, 'raw', 'BGRX', 0, 1)
+    screen = np.array(screen)
+
+    win32gui.DeleteObject(saveBitMap.GetHandle())
+    saveDC.DeleteDC()
+    mfcDC.DeleteDC()
+    win32gui.ReleaseDC(hwnd, hwndDC)
+
+    print("Win Captured")
+
+    cv2.imshow("screen", screen)
+
+    new_screen = cv2.resize(process_img(screen), (int(screen_sizex / 1), int(screen_sizey / 1)))
 
     #FPS
     print('Frame Time: {}'.format((time.time() - last_time))) #Broken
     last_time = time.time()
 
     cv2.imshow('window', new_screen)
-
-    if doonce == 0:
-        cv2.moveWindow('window', -900, 0)
-        doonce = 1
     if cv2.waitKey(1) & 0xFF == ord('q'):
         cv2.destroyAllWindows()
         break

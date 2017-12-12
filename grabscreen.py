@@ -14,21 +14,24 @@ def grab_screen(region=None):
         left = win32api.GetSystemMetrics(win32con.SM_XVIRTUALSCREEN)
         top = win32api.GetSystemMetrics(win32con.SM_YVIRTUALSCREEN)
 
-    hwindc = win32gui.GetWindowDC(hwin)
-    srcdc = win32ui.CreateDCFromHandle(hwindc)
-    memdc = srcdc.CreateCompatibleDC()
-    bmp = win32ui.CreateBitmap()
-    bmp.CreateCompatibleBitmap(srcdc, width, height)
-    memdc.SelectObject(bmp)
-    memdc.BitBlt((0, 0), (width, height), srcdc, (left, top), win32con.SRCCOPY)
+    hwndDC = win32gui.GetWindowDC(hwin)
+    mfcDC = win32ui.CreateDCFromHandle(hwndDC)
+    saveDC = mfcDC.CreateCompatibleDC()
 
-    signedIntsArray = bmp.GetBitmapBits(True)
-    img = np.fromstring(signedIntsArray, dtype='uint8')
+    saveBitMap = win32ui.CreateBitmap()
+    saveBitMap.CreateCompatibleBitmap(mfcDC, width, height)
+
+    saveDC.SelectObject(saveBitMap)
+    saveDC.BitBlt((0, 0), (width, height), mfcDC, (left, top), win32con.SRCCOPY)
+
+    bmpstr = saveBitMap.GetBitmapBits(True)
+
+    img = np.fromstring(bmpstr, dtype='uint8')
     img.shape = (height, width, 4)
 
-    srcdc.DeleteDC()
-    memdc.DeleteDC()
-    win32gui.ReleaseDC(hwin, hwindc)
-    win32gui.DeleteObject(bmp.GetHandle())
+    mfcDC.DeleteDC()
+    saveDC.DeleteDC()
+    win32gui.ReleaseDC(hwin, hwndDC)
+    win32gui.DeleteObject(saveBitMap.GetHandle())
 
     return cv2.cvtColor(img, cv2.COLOR_BGRA2RGB)
