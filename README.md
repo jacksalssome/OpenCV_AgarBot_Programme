@@ -13,3 +13,7 @@ System requirments:
 How to install/run:
 
 Put main.py and grabscreen.py in a folder, open agar.io fullscreen and run, the program will count down, then run.
+
+Todo:
+- Port OBS's screen capture so i can get some sort of reasonable framerate. (C++ to python)
+- Figgure out how OBS captures the screen.
